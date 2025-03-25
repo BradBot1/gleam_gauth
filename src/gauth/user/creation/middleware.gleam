@@ -13,21 +13,22 @@ pub fn trim_name(name: String) -> Result(String, UserCreationError) {
 }
 
 pub fn within_length(
-  name: String,
   min: Int,
   max: Int,
-) -> Result(String, UserCreationError) {
-  case string.length(name) {
-    len if len < min ->
-      Error(InvalidName(
-        name,
-        "Name is too short, must be atleast " <> int.to_string(min),
-      ))
-    len if len > max ->
-      Error(InvalidName(
-        name,
-        "Name is too long, must be atmost " <> int.to_string(max),
-      ))
-    _ -> Ok(name)
+) -> fn(String) -> Result(String, UserCreationError) {
+  fn(name: String) -> Result(String, UserCreationError) {
+    case string.length(name) {
+      len if len < min ->
+        Error(InvalidName(
+          name,
+          "Name is too short, must be atleast " <> int.to_string(min),
+        ))
+      len if len > max ->
+        Error(InvalidName(
+          name,
+          "Name is too long, must be atmost " <> int.to_string(max),
+        ))
+      _ -> Ok(name)
+    }
   }
 }
