@@ -1,24 +1,22 @@
-import gauth/user.{type User, type UserError}
+import gauth/user.{type User}
 
-pub type UserCreationError(identifier) {
+pub type UserCreationError {
   InvalidName(name: String, reason: String)
-  UserError(cause: UserError(identifier))
+  Generic(message: String)
 }
 
 pub type UserCreationService(identifier) {
   UserCreationService(
     create_user: fn(String) -> User(identifier),
-    middleware: List(
-      fn(String) -> Result(String, UserCreationError(identifier)),
-    ),
+    middleware: List(fn(String) -> Result(String, UserCreationError)),
     finalware: List(fn(User(identifier)) -> User(identifier)),
   )
 }
 
 fn create_user_middleware(
   user: String,
-  middleware: List(fn(String) -> Result(String, UserCreationError(identifier))),
-) -> Result(String, UserCreationError(identifier)) {
+  middleware: List(fn(String) -> Result(String, UserCreationError)),
+) -> Result(String, UserCreationError) {
   case middleware {
     [] -> Ok(user)
     [middleware, ..rest] ->
@@ -42,7 +40,7 @@ fn create_user_finalware(
 pub fn create_user(
   user: String,
   service: UserCreationService(identifier),
-) -> Result(User(identifier), UserCreationError(identifier)) {
+) -> Result(User(identifier), UserCreationError) {
   case create_user_middleware(user, service.middleware) {
     Ok(user) ->
       Ok(create_user_finalware(service.create_user(user), service.finalware))
