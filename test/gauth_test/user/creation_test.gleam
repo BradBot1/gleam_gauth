@@ -1,12 +1,8 @@
 import gauth/user
 import gauth/user/creation
-import gleam/int
+import gauth_test/user/common
 import gleam/list
 import gleeunit/should
-
-const amount_of_wares = 16_000
-
-const amount_of_users = 16_000
 
 fn null() -> creation.UserCreationService(Int) {
   creation.UserCreationService(
@@ -17,23 +13,11 @@ fn null() -> creation.UserCreationService(Int) {
   )
 }
 
-fn with_helper_sub(
-  service: creation.UserCreationService(Int),
-  action: fn(creation.UserCreationService(Int), Int) ->
-    creation.UserCreationService(Int),
-  counter: Int,
-) {
-  case counter {
-    c if counter >= amount_of_wares -> action(service, c)
-    _ -> with_helper_sub(action(service, counter), action, counter + 1)
-  }
-}
-
 fn with_helper(
   action: fn(creation.UserCreationService(Int), Int) ->
     creation.UserCreationService(Int),
 ) {
-  with_helper_sub(null(), action, 1)
+  common.with_helper(null(), action)
 }
 
 pub fn with_middleware_test() {
@@ -47,7 +31,7 @@ pub fn with_middleware_test() {
     })
   service.middleware
   |> list.length
-  |> should.equal(amount_of_wares)
+  |> should.equal(common.amount_of_iterations)
   service.finalware
   |> list.length
   |> should.equal(0)
@@ -70,7 +54,7 @@ pub fn with_finalware_test() {
   |> should.equal(0)
   serivce.finalware
   |> list.length
-  |> should.equal(amount_of_wares)
+  |> should.equal(common.amount_of_iterations)
   serivce.errorware
   |> list.length
   |> should.equal(0)
@@ -93,7 +77,7 @@ pub fn with_errorware_test() {
   |> should.equal(0)
   service.errorware
   |> list.length
-  |> should.equal(amount_of_wares)
+  |> should.equal(common.amount_of_iterations)
 }
 
 pub fn with_all_test() {
@@ -116,22 +100,17 @@ pub fn with_all_test() {
     })
   serivce.middleware
   |> list.length
-  |> should.equal(amount_of_wares)
+  |> should.equal(common.amount_of_iterations)
   serivce.finalware
   |> list.length
-  |> should.equal(amount_of_wares)
+  |> should.equal(common.amount_of_iterations)
   serivce.errorware
   |> list.length
 }
 
-fn generate_names() -> List(String) {
-  list.range(0, amount_of_users)
-  |> list.map(fn(id) { "user " <> int.to_string(id) })
-}
-
 pub fn create_user_none_test() {
   let service = null()
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, service) })
   |> list.map(should.be_ok)
@@ -142,7 +121,7 @@ pub fn create_user_middleware_mutate_test() {
   let service =
     null()
     |> creation.with_middleware(fn(name) { Ok(name <> " middleware") })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, service) })
   |> list.map(should.be_ok)
@@ -157,7 +136,7 @@ pub fn create_user_middleware_mutate_chain_test() {
     null()
     |> creation.with_middleware(fn(name) { Ok(name <> " middleware") })
     |> creation.with_middleware(fn(name) { Ok(name <> " other middleware") })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, service) })
   |> list.map(should.be_ok)
@@ -173,7 +152,7 @@ pub fn create_user_middleware_fail_test() {
     |> creation.with_middleware(fn(name) {
       Error(creation.InvalidName(name, "reason"))
     })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, service) })
   |> list.map(should.be_error)
@@ -195,7 +174,7 @@ pub fn create_user_middleware_fail_chain_test() {
     |> creation.with_middleware(fn(name) {
       Error(creation.InvalidName(name, "reason"))
     })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, service) })
   |> list.map(should.be_error)
@@ -213,7 +192,7 @@ pub fn create_user_finalware_mutate_test() {
     |> creation.with_finalware(fn(user) {
       user.User(user.id, user.name <> " finalware")
     })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, serivce) })
   |> list.map(should.be_ok)
@@ -232,7 +211,7 @@ pub fn create_user_finalware_mutate_chain_test() {
     |> creation.with_finalware(fn(user) {
       user.User(user.id, user.name <> " other finalware")
     })
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { creation.create_user(name, serivce) })
   |> list.map(should.be_ok)
@@ -249,7 +228,7 @@ pub fn create_user_errorware_test() {
     |> creation.with_middleware(fn(name) {
       Error(creation.InvalidName(name, "Always fail"))
     })
-  generate_names()
+  common.generate_names()
   |> list.map(fn(name) { creation.create_user(name, serivce) })
   |> list.map(should.be_error)
   |> list.each(fn(error) {
@@ -268,7 +247,7 @@ pub fn create_user_errorware_chain_test() {
     |> creation.with_middleware(fn(name) {
       Error(creation.InvalidName(name, "Always fail"))
     })
-  generate_names()
+  common.generate_names()
   |> list.map(fn(name) { creation.create_user(name, serivce) })
   |> list.map(should.be_error)
   |> list.each(fn(error) {
