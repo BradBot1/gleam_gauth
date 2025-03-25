@@ -10,6 +10,7 @@ pub type UserCreationService(identifier) {
     create_user: fn(String) -> User(identifier),
     middleware: List(fn(String) -> Result(String, UserCreationError)),
     finalware: List(fn(User(identifier)) -> User(identifier)),
+    errorware: List(fn(UserCreationError) -> UserCreationError),
   )
 }
 
@@ -27,13 +28,10 @@ fn create_user_middleware(
   }
 }
 
-fn create_user_finalware(
-  user: User(identifier),
-  finalware: List(fn(User(identifier)) -> User(identifier)),
-) -> User(identifier) {
-  case finalware {
-    [] -> user
-    [finalware, ..rest] -> create_user_finalware(finalware(user), rest)
+fn do_ware(obj: a, ware: List(fn(a) -> a)) -> a {
+  case ware {
+    [] -> obj
+    [ware, ..rest] -> do_ware(ware(obj), rest)
   }
 }
 
@@ -42,8 +40,7 @@ pub fn create_user(
   service: UserCreationService(identifier),
 ) -> Result(User(identifier), UserCreationError) {
   case create_user_middleware(user, service.middleware) {
-    Ok(user) ->
-      Ok(create_user_finalware(service.create_user(user), service.finalware))
-    Error(error) -> Error(error)
+    Ok(user) -> Ok(do_ware(service.create_user(user), service.finalware))
+    Error(error) -> Error(do_ware(error, service.errorware))
   }
 }
