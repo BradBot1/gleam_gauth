@@ -35,6 +35,42 @@ fn do_ware(obj: a, ware: List(fn(a) -> a)) -> a {
   }
 }
 
+pub fn with_middleware(
+  service: UserCreationService(identifier),
+  middleware: fn(String) -> Result(String, UserCreationError),
+) -> UserCreationService(identifier) {
+  UserCreationService(
+    service.create_user,
+    [middleware, ..service.middleware],
+    service.finalware,
+    service.errorware,
+  )
+}
+
+pub fn with_finalware(
+  service: UserCreationService(identifier),
+  finalware: fn(User(identifier)) -> User(identifier),
+) -> UserCreationService(identifier) {
+  UserCreationService(
+    service.create_user,
+    service.middleware,
+    [finalware, ..service.finalware],
+    service.errorware,
+  )
+}
+
+pub fn with_errorware(
+  service: UserCreationService(identifier),
+  errorware: fn(UserCreationError) -> UserCreationError,
+) -> UserCreationService(identifier) {
+  UserCreationService(
+    service.create_user,
+    service.middleware,
+    service.finalware,
+    [errorware, ..service.errorware],
+  )
+}
+
 pub fn create_user(
   user: String,
   service: UserCreationService(identifier),
