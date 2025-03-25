@@ -1,14 +1,7 @@
 import gauth/user/creation/simple
-import gleam/int
+import gauth_test/user/common
 import gleam/list
 import gleeunit/should
-
-const amount_of_users = 16_000
-
-fn generate_names() -> List(String) {
-  list.range(0, amount_of_users)
-  |> list.map(fn(id) { "user " <> int.to_string(id) })
-}
 
 pub fn creation_integrity() {
   let service = simple.new()
@@ -20,13 +13,13 @@ pub fn creation_integrity() {
 }
 
 pub fn id_zero_test() {
-  generate_names()
+  common.generate_names()
   |> list.map(fn(name) { simple.new().create_user(name).id })
   |> list.each(should.equal(_, 0))
 }
 
 pub fn name_test() {
-  let names = generate_names()
+  let names = common.generate_names()
   names
   |> list.map(fn(name) { simple.new().create_user(name).name })
   |> list.map2(names, fn(user, name) { user |> should.equal(name) })
