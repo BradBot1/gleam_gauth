@@ -2,8 +2,8 @@ import gauth/user.{type User}
 import gleam/option.{type Option}
 
 pub type UserDataError(identifier) {
-  NoSuchData(user: user.User(identifier))
-  Generic(message: String)
+  NoSuchData(id: identifier)
+  Generic(id: identifier, message: String)
 }
 
 pub type UserDataSource(identifier, data_store) {
