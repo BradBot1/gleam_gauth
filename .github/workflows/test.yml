@@ -37,22 +37,22 @@ jobs:
           node-version: 22
       - run: gleam deps download
       - run: gleam test --target javascript --runtime node
-  # deno:
-  #   runs-on: ubuntu-latest
-  #   name: DenoJS
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: erlef/setup-beam@v1
-  #       with:
-  #         otp-version: "26.0.2"
-  #         gleam-version: "1.9.0"
-  #         rebar3-version: "3"
-  #         elixir-version: "1.15.4"
-  #     - uses: denoland/setup-deno@v2
-  #       with:
-  #         deno-version: v2.x
-  #     - run: gleam deps download
-  #     - run: gleam test --target javascript --runtime deno -- --allow-all
+  deno:
+    runs-on: ubuntu-latest
+    name: DenoJS
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "26.0.2"
+          gleam-version: "1.9.0"
+          rebar3-version: "3"
+          elixir-version: "1.15.4"
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: gleam deps download
+      - run: gleam test --target javascript --runtime deno
   bun:
     runs-on: ubuntu-latest
     name: BunJS

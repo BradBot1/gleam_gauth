@@ -10,3 +10,10 @@ gleam_stdlib = ">= 0.34.0 and < 2.0.0"
 
 [dev-dependencies]
 gleeunit = ">= 1.0.0 and < 2.0.0"
+
+[javascript.deno]
+allow_read = [
+  "gleam.toml",
+  "test",
+  "build",
+]
