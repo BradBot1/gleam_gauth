@@ -1,5 +1,11 @@
-import gleam/io
+import gauth/user/creation
+import gauth/user/data
+import gauth/user/deletion
 
-pub fn main() {
-  io.println("Hello from auth!")
+pub type Auth(indentifier) {
+  Auth(
+    creation: creation.UserCreationService(indentifier),
+    deletion: deletion.UserDeletionService(indentifier),
+    data: data.UserDataService(indentifier),
+  )
 }
