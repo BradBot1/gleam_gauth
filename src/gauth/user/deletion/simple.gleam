@@ -13,6 +13,7 @@
 //  limitations under the License.
 import gauth/user/deletion
 
+/// Just returns a UserDeletionError with the value of "SimpleUserDeletionService cannot delete users, please use an alternative if this functionality is needed"
 fn delete_user(
   _name: identifier,
 ) -> Result(Nil, deletion.UserDeletionError(identifier)) {
@@ -21,6 +22,8 @@ fn delete_user(
   ))
 }
 
+/// Creates an UserDeletionService that fails on delete_user.
+/// Only designed for testing and development.
 pub fn new() -> deletion.UserDeletionService(identifier) {
   delete_user |> deletion.UserDeletionService([], [])
 }

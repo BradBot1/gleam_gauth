@@ -13,11 +13,16 @@
 //  limitations under the License.
 import gleam/option.{type Option}
 
+/// A tuple of an identifier and a name
+/// Identifiers must be unique.
+/// Names can be reused across Users.
 pub type User(identifier) {
   User(id: identifier, name: String)
 }
 
 pub type UserError(identifier) {
+  /// A generic error such as a user being disabled.
   Generic(message: String)
+  /// The user id provided isn't valid, IE too long/format etc
   InvalidId(id: Option(identifier))
 }

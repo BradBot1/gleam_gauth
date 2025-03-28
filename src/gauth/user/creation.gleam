@@ -13,11 +13,16 @@
 //  limitations under the License.
 import gauth/user.{type User}
 
+/// An error that occurs during user creation
 pub type UserCreationError {
+  /// The name provided was invalid, the reason must be a human readable explanation of what went wrong
   InvalidName(name: String, reason: String)
+  /// A catch all error type for when something goes wrong IE the data source is unreachable
   Generic(message: String)
 }
 
+/// A service to create users
+/// Do not interact with the create_user function directly, instead use the create_user function provided by this module
 pub type UserCreationService(identifier) {
   UserCreationService(
     create_user: fn(String) -> User(identifier),
@@ -41,6 +46,7 @@ fn create_user_middleware(
   }
 }
 
+/// Performs all wares in sequence
 fn do_ware(obj: a, ware: List(fn(a) -> a)) -> a {
   case ware {
     [] -> obj
@@ -48,6 +54,8 @@ fn do_ware(obj: a, ware: List(fn(a) -> a)) -> a {
   }
 }
 
+/// Adds a middleware to the service
+/// The provided middleware is appended at the start of the middleware list
 pub fn with_middleware(
   service: UserCreationService(identifier),
   middleware: fn(String) -> Result(String, UserCreationError),
@@ -60,6 +68,8 @@ pub fn with_middleware(
   )
 }
 
+/// Adds a finalware to the service
+/// The provided finalware is appended at the start of the finalware list
 pub fn with_finalware(
   service: UserCreationService(identifier),
   finalware: fn(User(identifier)) -> User(identifier),
@@ -72,6 +82,8 @@ pub fn with_finalware(
   )
 }
 
+/// Adds an errorware to the service
+/// The provided errorware is appended at the start of the errorware list
 pub fn with_errorware(
   service: UserCreationService(identifier),
   errorware: fn(UserCreationError) -> UserCreationError,
@@ -84,6 +96,13 @@ pub fn with_errorware(
   )
 }
 
+/// Creates a user with the given name by:
+/// - Applying all middleware in sequence
+/// - Creating the user via the service's create_user function
+/// - Applying all finalware in sequence
+/// - Returning the user
+/// The name is not checked for validity, to add this please look into middleware
+/// Any errors will first go through all errorware in sequence before being returned
 pub fn create_user(
   user: String,
   service: UserCreationService(identifier),

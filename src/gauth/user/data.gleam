@@ -14,17 +14,22 @@
 import gauth/user.{type User}
 import gleam/option.{type Option}
 
+/// An error relating the the procurment of user data
 pub type UserDataError(identifier) {
+  /// The user has no relevent data
   NoSuchData(id: identifier)
+  /// A generic error such as the data source being unreachable
   Generic(id: identifier, message: String)
 }
 
+/// A source to collect data for a user
 pub type UserDataSource(identifier, data_store) {
   UserDataSource(
     get_data: fn(identifier) -> Result(data_store, UserDataError(identifier)),
   )
 }
 
+/// A source to get a user by their ID
 pub type UserDataService(identifier) {
   UserDataService(get_user: fn(identifier) -> Option(User(identifier)))
 }

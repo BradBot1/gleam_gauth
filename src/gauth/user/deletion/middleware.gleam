@@ -13,6 +13,8 @@
 //  limitations under the License.
 import gauth/user/deletion.{type UserDeletionError, Generic}
 
+/// Disables deleting of users by making it always fail.
+/// Will always return a generic UserDeletionError with a value of "Deletion of users is disabled"
 pub fn disabled(
   _user: identifier,
 ) -> Result(identifier, UserDeletionError(identifier)) {

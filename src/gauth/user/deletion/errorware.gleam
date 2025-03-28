@@ -14,6 +14,7 @@
 import gauth/user/deletion
 import gleam/io
 
+/// Logs to stderr when a user isn't deleted
 pub fn logging(
   error: deletion.UserDeletionError(identifier),
 ) -> deletion.UserDeletionError(identifier) {

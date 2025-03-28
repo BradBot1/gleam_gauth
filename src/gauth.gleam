@@ -15,6 +15,8 @@ import gauth/user/creation
 import gauth/user/data
 import gauth/user/deletion
 
+/// A simple struct for the creation, deletion, and data fetching of users.
+/// Shouldn't be depended upon unless you need all three, prefer requiring single components as paramters
 pub type Auth(indentifier) {
   Auth(
     creation: creation.UserCreationService(indentifier),

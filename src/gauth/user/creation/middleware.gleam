@@ -16,15 +16,18 @@ import gleam/int
 import gleam/io
 import gleam/string
 
+/// Logs to stdout when a user is about to be created
 pub fn logging(name: String) -> Result(String, UserCreationError) {
   io.println("Creating user with name: " <> name)
   Ok(name)
 }
 
+/// Runs string.trim on the provided name
 pub fn trim_name(name: String) -> Result(String, UserCreationError) {
   Ok(name |> string.trim)
 }
 
+/// Returns a middleware that ensures the provided name is within the required bounds. If it is not then it will return an InvalidName error 
 pub fn within_length(
   min: Int,
   max: Int,

@@ -14,6 +14,7 @@
 import gauth/user/creation
 import gleam/io
 
+/// Logs to stderr when a user isn't created
 pub fn logging(error: creation.UserCreationError) -> creation.UserCreationError {
   case error {
     creation.InvalidName(name, reason) ->

@@ -14,10 +14,13 @@
 import gauth/user
 import gauth/user/creation
 
+/// Creates a stub user
 fn create_user(name: String) -> user.User(Int) {
   user.User(id: 0, name: name)
 }
 
+/// Returns a UserCreationService that blindly instantiates a user with the provided name.
+/// Is only indended for development purposes as no data is persisted.
 pub fn new() -> creation.UserCreationService(Int) {
   create_user |> creation.UserCreationService([], [], [])
 }
